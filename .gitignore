@@ -1,3 +1,15 @@
+input/
+middle/
+PS/
+output*
+result*
+IMG20251119214710.jpg
+
+
+
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
