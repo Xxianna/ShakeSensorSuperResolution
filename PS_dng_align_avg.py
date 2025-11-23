@@ -5,6 +5,15 @@ import numpy as np
 from skimage.transform import resize_local_mean
 import imageio
 
+
+# 模仿网上教程中 在PS里先解码赛克，临近采样放大，再配准合成的方法
+# 由于先解马赛克，不能完全消除色差
+
+
+
+
+
+
 # 创建文件夹
 os.makedirs('middle', exist_ok=True)
 
