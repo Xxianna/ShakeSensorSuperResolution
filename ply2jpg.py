@@ -53,26 +53,31 @@ for y in tqdm(range(height), desc="Processing rows"):
         # 在R点云中找最近点
         _, indices, _ = kdtree_r.search_knn_vector_3d(sample_point, 1)
         if len(indices) > 0:
-            image[y, x, 0] = int(np.asarray(pcd_r.colors)[indices[0], 0] * 65535)
+            image[y, x, 0] = int(np.asarray(pcd_r.normals)[indices[0], 0])  # 直接取值，不乘65535
         
         # 在G点云中找最近点
         _, indices, _ = kdtree_g.search_knn_vector_3d(sample_point, 1)
         if len(indices) > 0:
-            image[y, x, 1] = int(np.asarray(pcd_g.colors)[indices[0], 1] * 65535)
+            image[y, x, 1] = int(np.asarray(pcd_g.normals)[indices[0], 1])
         
         # 在B点云中找最近点
         _, indices, _ = kdtree_b.search_knn_vector_3d(sample_point, 1)
         if len(indices) > 0:
-            image[y, x, 2] = int(np.asarray(pcd_b.colors)[indices[0], 2] * 65535)
+            image[y, x, 2] = int(np.asarray(pcd_b.normals)[indices[0], 2])
     
     # 每完成5%保存一次图片（转成 uint8 用于 JPG）
     if (y + 1) % save_interval == 0 or y == height - 1:
-        # 压缩到 [0, 255] 并转换为 uint8
-        image_normalized = np.clip(image, 0, 65535)  # 先限幅到合法范围
-        image_uint8 = (image_normalized / 2).astype(np.uint8)
+        # 根据最大最小值映射到0-255
+        img_min = image.min()
+        img_max = image.max()
+        if img_max > img_min:
+            image_normalized = (image - img_min) / (img_max - img_min) * 255
+        else:
+            image_normalized = np.zeros_like(image)
+        image_uint8 = image_normalized.astype(np.uint8)
         cv2.imwrite(f"output_ply2png.jpg", image_uint8)
 
+
 # 最终保存为 16 位 PNG（保持原始 int16 精度）
-image_uint16 = np.clip(image, 0, 65535).astype(np.uint16)
-cv2.imwrite("output_ply2png.png", image_uint16)
+cv2.imwrite("output_ply2png.png", image)
 

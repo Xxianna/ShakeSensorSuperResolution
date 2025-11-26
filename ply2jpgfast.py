@@ -13,7 +13,7 @@ def process_single_channel(file_path, channel_idx, output_file, x_min, x_max, y_
     
     # 处理图像
     image = np.zeros((height, width), dtype=np.int16)
-    colors = np.asarray(pcd.colors)
+    colors = np.asarray(pcd.normals)
     
     xy_range_x = x_max - x_min
     xy_range_y = y_max - y_min
@@ -28,7 +28,7 @@ def process_single_channel(file_path, channel_idx, output_file, x_min, x_max, y_
             
             _, indices, _ = kdtree.search_knn_vector_3d(sample_point, 1)
             if len(indices) > 0:
-                image[y, x] = int(colors[indices[0], channel_idx] * 65535)
+                image[y, x] = int(colors[indices[0], channel_idx])
     
     return image
 

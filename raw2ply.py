@@ -107,11 +107,11 @@ for i, file in enumerate(files):
     points = np.hstack([coords, np.zeros((coords.shape[0], 1))])
 
     # 提取颜色值并归一化
-    colors = img.reshape(-1, 3)[:, ::-1] / 65536.0  # BGR -> RGB and normalize 
-    
+    colors = img.reshape(-1, 3)[:, ::-1].astype(np.float32)  # BGR -> RGB and normalize 
+
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(points)
-    pcd.colors = o3d.utility.Vector3dVector(colors)
+    pcd.normals = o3d.utility.Vector3dVector(colors)
     final_pcd += pcd
 
 o3d.io.write_point_cloud("result.ply", final_pcd)
