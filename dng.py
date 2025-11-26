@@ -9,33 +9,62 @@ import numpy as np
 # 不解拜尔阵列的输出每个颜色滤镜的传感器效果
 
 
-def raw_to_bayer_rgb(path):
-    with rawpy.imread(path) as raw:
-        pattern = raw.raw_pattern
-        raw_data = raw.raw_image
-        h, w = raw_data.shape
+# def raw_to_bayer_rgb(path):
+#     with rawpy.imread(path) as raw:
+#         pattern = raw.raw_pattern
+#         raw_data = raw.raw_image
+#         h, w = raw_data.shape
 
-        print(raw_data)
+#         print(raw_data)
         
-        # 创建输出RGB图像（保持原始数据位数）
-        rgb = np.zeros((h, w, 3), dtype=raw_data.dtype)
+#         # 创建输出RGB图像（保持原始数据位数）
+#         rgb = np.zeros((h, w, 3), dtype=raw_data.dtype)
         
-        # 扩展Bayer模式到全图尺寸
-        r_map = np.tile(pattern == 0, (h//2+1, w//2+1))[:h,:w]
-        g_map = np.tile((pattern == 1) | (pattern == 3), (h//2+1, w//2+1))[:h,:w]
-        b_map = np.tile(pattern == 2, (h//2+1, w//2+1))[:h,:w]
+#         # 扩展Bayer模式到全图尺寸
+#         r_map = np.tile(pattern == 0, (h//2+1, w//2+1))[:h,:w]
+#         g_map = np.tile((pattern == 1) | (pattern == 3), (h//2+1, w//2+1))[:h,:w]
+#         b_map = np.tile(pattern == 2, (h//2+1, w//2+1))[:h,:w]
         
-        # 将原始数据分配到对应通道
-        rgb[..., 0] = raw_data * r_map*100  # R通道
-        rgb[..., 1] = raw_data * g_map*100  # G通道
-        rgb[..., 2] = raw_data * b_map*100  # B通道
+#         # 将原始数据分配到对应通道
+#         rgb[..., 0] = raw_data * r_map*100  # R通道
+#         rgb[..., 1] = raw_data * g_map*100  # G通道
+#         rgb[..., 2] = raw_data * b_map*100  # B通道
         
-        return rgb
+#         return rgb
 
 
-def save_16bit_png(filename, rgb_image):
-    # 直接保存16位数据
-    cv2.imwrite(filename, rgb_image)
+# def save_16bit_png(filename, rgb_image):
+#     # 直接保存16位数据
+#     cv2.imwrite(filename, rgb_image)
 
-img = raw_to_bayer_rgb("input/IMG20251119214636.dng")
-save_16bit_png('test.png', img)
+# img = raw_to_bayer_rgb("input/IMG20251119214636.dng")
+# save_16bit_png('test.png', img)
+
+import rawpy
+import numpy as np
+
+# with rawpy.imread("input/IMG20251119214636.dng") as raw:
+with rawpy.imread("DSC02316.ARW") as raw:
+# with rawpy.imread("DSC_7057.NEF") as raw:
+    pattern = raw.raw_pattern
+    raw_data = raw.raw_image
+    
+    # 数值范围
+    min_val = np.min(raw_data)
+    max_val = np.max(raw_data)
+    
+    # 用log2确定指数范围
+    if min_val > 0:
+        min_exp = np.floor(np.log2(min_val))
+    else:
+        min_exp = 0
+        
+    if max_val > 0:
+        max_exp = np.ceil(np.log2(max_val))
+    else:
+        max_exp = 0
+    
+    print(f"指数范围: [{min_exp}, {max_exp}]")
+    print(f"数值范围: [{min_val}, {max_val}]")
+
+

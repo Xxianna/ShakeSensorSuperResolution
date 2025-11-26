@@ -5,7 +5,11 @@
 ![alt text](assert/e686e4817c3420d5b6d422b84d8796ba.png)
 
 
+**三维采样**
 
+1. raw2ply.py
+2. plyRGB23.py
+3. 
 
 
 

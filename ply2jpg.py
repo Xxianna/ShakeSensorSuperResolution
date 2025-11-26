@@ -36,7 +36,8 @@ width = (x_max - x_min + 1) * 2
 height = (y_max - y_min + 1) * 2
 
 # 创建opencv图像
-image = np.zeros((height, width, 3), dtype=np.uint8)
+# 创建 OpenCV 图像（使用 int16）
+image = np.zeros((height, width, 3), dtype=np.int16)
 
 # 计算保存间隔
 save_interval = max(1, height // 20)  # 每5%保存一次
@@ -52,18 +53,26 @@ for y in tqdm(range(height), desc="Processing rows"):
         # 在R点云中找最近点
         _, indices, _ = kdtree_r.search_knn_vector_3d(sample_point, 1)
         if len(indices) > 0:
-            image[y, x, 0] = int(np.asarray(pcd_r.colors)[indices[0], 0] * 255)
+            image[y, x, 0] = int(np.asarray(pcd_r.colors)[indices[0], 0] * 65535)
         
         # 在G点云中找最近点
         _, indices, _ = kdtree_g.search_knn_vector_3d(sample_point, 1)
         if len(indices) > 0:
-            image[y, x, 1] = int(np.asarray(pcd_g.colors)[indices[0], 1] * 255)
+            image[y, x, 1] = int(np.asarray(pcd_g.colors)[indices[0], 1] * 65535)
         
         # 在B点云中找最近点
         _, indices, _ = kdtree_b.search_knn_vector_3d(sample_point, 1)
         if len(indices) > 0:
-            image[y, x, 2] = int(np.asarray(pcd_b.colors)[indices[0], 2] * 255)
+            image[y, x, 2] = int(np.asarray(pcd_b.colors)[indices[0], 2] * 65535)
     
-    # 每完成5%保存一次图片
+    # 每完成5%保存一次图片（转成 uint8 用于 JPG）
     if (y + 1) % save_interval == 0 or y == height - 1:
-        cv2.imwrite(f"output_{(y+1)//save_interval}.jpg", image)
+        # 压缩到 [0, 255] 并转换为 uint8
+        image_normalized = np.clip(image, 0, 65535)  # 先限幅到合法范围
+        image_uint8 = (image_normalized / 2).astype(np.uint8)
+        cv2.imwrite(f"output_ply2png.jpg", image_uint8)
+
+# 最终保存为 16 位 PNG（保持原始 int16 精度）
+image_uint16 = np.clip(image, 0, 65535).astype(np.uint16)
+cv2.imwrite("output_ply2png.png", image_uint16)
+

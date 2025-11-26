@@ -81,9 +81,9 @@ def raw_to_bayer_rgb(path):
         b_map = np.tile(pattern == 2, (h//2+1, w//2+1))[:h,:w]
         
         # 将原始数据分配到对应通道
-        rgb[..., 0] = raw_data * r_map*200  # R通道
-        rgb[..., 1] = raw_data * g_map*100  # G通道
-        rgb[..., 2] = raw_data * b_map*200  # B通道
+        rgb[..., 0] = raw_data * r_map  # R通道
+        rgb[..., 1] = raw_data * g_map  # G通道
+        rgb[..., 2] = raw_data * b_map  # B通道
 
         rgb = np.rot90(rgb, k=2)  # raw数据和输出数据有旋转180度关系
         
@@ -107,8 +107,8 @@ for i, file in enumerate(files):
     points = np.hstack([coords, np.zeros((coords.shape[0], 1))])
 
     # 提取颜色值并归一化
-    colors = img.reshape(-1, 3)[:, ::-1] / 65536.0  # BGR -> RGB and normalize
-
+    colors = img.reshape(-1, 3)[:, ::-1] / 65536.0  # BGR -> RGB and normalize 
+    
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(points)
     pcd.colors = o3d.utility.Vector3dVector(colors)
