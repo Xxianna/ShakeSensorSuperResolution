@@ -11,7 +11,7 @@ import multiprocessing as mp
 input_dir = "inputd600"
 outputname = "d600_96mp.png"
 target_resolution_times = 2
-
+rot_180_for_raw = False     # 对手机的dng有时需要旋转，对NEF有时不需要旋转。没配上就转一下
 
 
 
@@ -25,7 +25,7 @@ def greeninfo(str):
     timestamp = f"[{int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}]"
     print(f"\033[32m【{timestamp}】=========={str}==========\033[0m")
 
-def raw2ply(input_dir):
+def raw2ply(input_dir, rot_180_for_raw = False):
     # 获取所有DNG文件
     # files = sorted([f for f in os.listdir(input_dir) if f.lower().endswith('.dng')])
     files = sorted([f for f in os.listdir(input_dir)])
@@ -103,7 +103,8 @@ def raw2ply(input_dir):
             rgb[..., 1] = raw_data * g_map  # G通道
             rgb[..., 2] = raw_data * b_map  # B通道
 
-            rgb = np.rot90(rgb, k=2)  # raw数据和输出数据有旋转180度关系
+            if rot_180_for_raw:
+                rgb = np.rot90(rgb, k=2)  # raw数据和输出数据有旋转180度关系
             
             return rgb
 
@@ -276,7 +277,7 @@ def pic8bit(img):
 
 if __name__ == '__main__':
     greeninfo(f"开始摇摇乐，输入文件夹{input_dir}，输出文件{outputname}")
-    ply = raw2ply(input_dir)
+    ply = raw2ply(input_dir, rot_180_for_raw)
     greeninfo(f"生成全局点云完成，开始拆分RGB点云")
     pcd_r, pcd_g, pcd_b = plyRGB23(ply)
     greeninfo(f"拆分RGB点云完成，开始采样，放大倍率{target_resolution_times}")
