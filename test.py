@@ -1,16 +1,15 @@
-import open3d as o3d
+import cv2
 import numpy as np
 
-def check_ply_color_range(ply_path):
-    pcd = o3d.io.read_point_cloud(ply_path)
-    if not pcd.has_colors():
-        print("点云无颜色信息")
-        return
-    
-    colors = np.asarray(pcd.colors)
-    print(f"颜色数据类型: {colors.dtype}")
-    print(f"颜色范围: [{colors.min():.6f}, {colors.max():.6f}]")
-    print(f"理论16位整数范围: [{int(colors.min()*65535)}, {int(colors.max()*65535)}]")
+# 读取图像
+img = cv2.imread('output_ply2png_fast.png', cv2.IMREAD_UNCHANGED)
 
-# 使用示例
-check_ply_color_range("result_R.ply")
+# 转换为浮点型并归一化到0-1范围
+img_normalized = img.astype(np.float32)
+img_normalized = (img_normalized - img_normalized.min()) / (img_normalized.max() - img_normalized.min())
+
+# 缩放到0-255并转换为uint8
+img_8bit = (img_normalized * 255).astype(np.uint8)
+
+# 保存结果
+cv2.imwrite('output_ply2png_fast_8.jpg', img_8bit)

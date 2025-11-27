@@ -7,10 +7,16 @@
 
 **三维采样**
 
+- 修改```3d_raw_near_sample.py```文件开头参数，输入raw文件夹，输出16位色深png地址，放大倍率
+- 暂不支持曲面拟合采样，目前为最近点
+- 暂不支持cuda加速
+
+- 或者：
+```
 1. raw2ply.py
 2. plyRGB23.py
 3. ply2jpgfast.py
-
+```
 
 
 

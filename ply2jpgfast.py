@@ -4,6 +4,12 @@ import cv2
 from tqdm import tqdm
 import multiprocessing as mp
 
+
+# 放大系数
+resolution_mul = 4
+
+
+
 def process_single_channel(file_path, channel_idx, output_file, x_min, x_max, y_min, y_max, width, height, show_progress=False):
     # 读取点云
     pcd = o3d.io.read_point_cloud(file_path)
@@ -62,8 +68,8 @@ def main():
     print(f"取整后XY包围盒范围: x=[{x_min}, {x_max}], y=[{y_min}, {y_max}]")
     
     # 构建二维图像，分辨率为包围盒尺寸的二倍
-    width = (x_max - x_min + 1) * 2
-    height = (y_max - y_min + 1) * 2
+    width = (x_max - x_min + 1) * resolution_mul
+    height = (y_max - y_min + 1) * resolution_mul
     
     # 多进程处理三个通道
     with mp.Pool(3) as pool:
